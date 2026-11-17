@@ -6,7 +6,7 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>Beeperpay Coin Rush</title>
 
@@ -14,79 +14,41 @@
 
 *{box-sizing:border-box}
 
-body{
+body{margin:0;background:#07152d;color:white;font-family:Arial,sans-serif;overflow:hidden;touch-action:none}
 
- margin:0;background:#071b49;color:white;
+#game{position:fixed;inset:0}
 
- font-family:Arial,sans-serif;overflow:hidden;
+canvas{display:block}
 
- touch-action:none
+#hud{position:absolute;top:15px;left:0;right:0;display:flex;justify-content:space-between;padding:12px;pointer-events:none;z-index:3}
 
-}
+.panel{background:#07152ddd;border:1px solid #d5aa42;border-radius:14px;padding:10px 15px;font-weight:bold;box-shadow:0 4px 15px #0005}
 
-header{
+#brand{position:absolute;top:75px;left:0;right:0;text-align:center;font-weight:900;letter-spacing:3px;color:#f4c64d;text-shadow:0 2px 5px #000}
 
- height:65px;background:#09245d;
+#overlay{position:absolute;inset:0;background:linear-gradient(#06142bd9,#06142b99);display:flex;align-items:center;justify-content:center;z-index:5;padding:20px}
 
- display:flex;align-items:center;justify-content:space-between;
+.card{background:#10274b;border:2px solid #e5b944;border-radius:24px;padding:28px 22px;text-align:center;width:min(90%,390px);box-shadow:0 12px 40px #0008}
 
- padding:10px 15px;font-weight:bold
+h1{color:#f5c84c;font-size:29px;margin:0 0 10px}
 
-}
+.card p{line-height:1.5;color:#dbe7fa}
 
-.logo{font-size:19px}
+button{border:0;border-radius:14px;padding:14px 20px;font-weight:bold;font-size:16px;cursor:pointer}
 
-.logo span{color:#ffc928}
+.primary{background:#e8b83d;color:#14233d;width:100%;margin-top:12px}
 
-.stats{display:flex;gap:9px}
+#controls{position:absolute;bottom:20px;left:0;right:0;display:flex;justify-content:space-between;padding:0 22px;z-index:4;pointer-events:none}
 
-.pill{background:white;color:#09245d;border-radius:25px;padding:10px;font-weight:bold}
+.control{pointer-events:auto;background:#07152dcc;color:white;border:2px solid #e7bb47;border-radius:50%;width:62px;height:62px;font-size:24px}
 
-#game{display:block;width:100%;height:calc(100dvh - 125px)}
+#rightControls{display:flex;gap:12px}
 
-footer{
+#hint{position:absolute;bottom:95px;left:0;right:0;text-align:center;color:white;font-size:12px;text-shadow:0 2px 4px #000;pointer-events:none}
 
- height:60px;background:#09245d;text-align:center;
+#toast{position:absolute;top:125px;left:0;right:0;text-align:center;color:#ffda63;font-weight:bold;font-size:20px;display:none;z-index:4}
 
- padding:17px 5px;font-size:13px
-
-}
-
-.overlay{
-
- position:fixed;inset:0;background:#061a43dd;
-
- display:flex;align-items:center;justify-content:center;
-
- padding:20px;z-index:5
-
-}
-
-.panel{
-
- background:white;color:#243653;border-radius:25px;
-
- padding:28px 20px;text-align:center;width:100%;max-width:430px
-
-}
-
-h1{color:#df9b00;font-size:35px;margin:5px}
-
-p{line-height:1.5;font-size:17px}
-
-button{
-
- border:0;background:#ffc928;color:#09245d;
-
- font-size:18px;font-weight:bold;padding:17px 30px;
-
- border-radius:15px;cursor:pointer;margin:8px
-
-}
-
-.small{font-size:13px;color:#68758d}
-
-#reward{display:none}
+#small{font-size:12px;color:#a9bedb}
 
 </style>
 
@@ -94,397 +56,175 @@ button{
 
 <body>
 
-<header>
+<div id="game"></div>
 
- <div class="logo">BEEPER<span>PAY</span> COIN RUSH</div>
+<div id="hud">
 
- <div class="stats">
+ <div class="panel">🪙 <span id="coins">0</span></div>
 
-  <div class="pill">🪙 <span id="coins">0</span></div>
+ <div class="panel">🏆 <span id="score">0</span></div>
 
-  <div class="pill">BEST <span id="best">0</span></div>
+ <div class="panel">⭐ <span id="best">0</span></div>
 
- </div>
+</div>
 
-</header>
+<div id="brand">BEEPERPAY</div>
 
-<canvas id="game"></canvas>
+<div id="toast"></div>
 
-<footer>SWIPE TO MOVE • COLLECT COINS • AVOID OBSTACLES</footer>
+<div id="overlay">
 
-<div class="overlay" id="welcome">
+ <div class="card">
 
- <div class="panel">
+  <h1>BEEPERPAY<br>COIN RUSH</h1>
 
-  <h1>🪙 COIN RUSH</h1>
+  <p>Run through the city, collect gold coins and dodge obstacles!</p>
 
-  <p>Run, dodge and collect coins! Swipe left or right to change lanes. Swipe up to jump and down to slide.</p>
+  <p>⬅️ Change lanes · ⬆️ Jump · ⬇️ Slide</p>
 
-  <button onclick="startGame()">START RUNNING</button>
+  <button class="primary" id="start">START RUNNING</button>
 
-  <p class="small">Original Beeperpay Games prototype. Demo coins have no cash value.</p>
+  <p id="small">Original Beeperpay game prototype</p>
 
  </div>
 
 </div>
 
-<div class="overlay" id="over" style="display:none">
+<div id="hint">Swipe left/right to move · Swipe up to jump · Swipe down to slide</div>
 
- <div class="panel">
+<div id="controls">
 
-  <h1>GAME OVER!</h1>
+ <button class="control" id="left">◀</button>
 
-  <p>You collected <b id="earned">0</b> coins this run.</p>
+ <div id="rightControls">
 
-  <button onclick="startGame()">PLAY AGAIN</button>
+  <button class="control" id="jump">⬆</button>
 
- </div>
+  <button class="control" id="slide">⬇</button>
 
-</div>
-
-<div class="overlay" id="reward" style="display:none">
-
- <div class="panel">
-
-  <h1>🎉 REWARD UNLOCKED!</h1>
-
-  <p>You reached another 1,000-coin milestone!</p>
-
-  <h2 style="color:#d99a00">Sponsored Reward Demo</h2>
-
-  <p>Imagine a Beeperpay advertising partner sponsoring this reward.</p>
-
-  <p class="small">Demo only. No cash or actual sponsored payment is awarded.</p>
-
-  <button onclick="closeReward()">CONTINUE PLAYING</button>
+  <button class="control" id="right">▶</button>
 
  </div>
 
 </div>
 
-<script>
+<script type="importmap">
 
-const canvas=document.getElementById("game");
+{
 
-const ctx=canvas.getContext("2d");
+ "imports":{
 
-let W,H,playing=false,paused=false;
-
-let lane=1,objects=[],score=0,speed=4;
-
-let jump=0,slide=0,lastTime=0,spawnTimer=0;
-
-function getSaved(key, fallback){
-
- try{
-
-  const value=localStorage.getItem(key);
-
-  return value===null?fallback:JSON.parse(value);
-
- }catch(e){return fallback}
-
-}
-
-function save(key,value){
-
- try{localStorage.setItem(key,JSON.stringify(value))}catch(e){}
-
-}
-
-let totalCoins=getSaved("bpr_total",0);
-
-let best=getSaved("bpr_best",0);
-
-let claimed=getSaved("bpr_claimed",0);
-
-function updateStats(){
-
- document.getElementById("coins").textContent=totalCoins;
-
- document.getElementById("best").textContent=best;
-
-}
-
-updateStats();
-
-function resize(){
-
- const rect=canvas.getBoundingClientRect();
-
- const dpr=Math.min(devicePixelRatio||1,2);
-
- W=rect.width;H=rect.height;
-
- canvas.width=W*dpr;canvas.height=H*dpr;
-
- ctx.setTransform(dpr,0,0,dpr,0,0);
-
-}
-
-window.addEventListener("resize",resize);
-
-resize();
-
-function road(){
-
- const horizon=H*.12;
-
- const bottom=H;
-
- ctx.fillStyle="#d3a16c";
-
- ctx.fillRect(0,0,W,H);
-
- ctx.fillStyle="#285f78";
-
- ctx.fillRect(0,0,W,horizon);
-
- ctx.fillStyle="#454b59";
-
- ctx.beginPath();
-
- ctx.moveTo(W*.34,horizon);
-
- ctx.lineTo(W*.66,horizon);
-
- ctx.lineTo(W*.98,bottom);
-
- ctx.lineTo(W*.02,bottom);
-
- ctx.closePath();
-
- ctx.fill();
-
- ctx.strokeStyle="#f5d46b";
-
- ctx.lineWidth=3;
-
- for(let i=1;i<3;i++){
-
-  const x=W*(.34+i*.106);
-
-  const bx=W*(i/3);
-
-  ctx.beginPath();
-
-  ctx.moveTo(x,horizon);
-
-  ctx.lineTo(bx,bottom);
-
-  ctx.stroke();
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
 
  }
 
 }
 
-function laneX(l,y){
+</script>
 
- const t=Math.max(0,Math.min(1,y/H));
+<script type="module">
 
- const left=W*.34+(W*.02-W*.34)*t;
+import * as THREE from "three";
 
- const right=W*.66+(W*.98-W*.66)*t;
+const root=document.getElementById("game");
 
- return left+(right-left)*(l+.5)/3;
+const scene=new THREE.Scene();
 
-}
+scene.background=new THREE.Color(0x8bc5ed);
 
-function drawPlayer(){
+scene.fog=new THREE.Fog(0x8bc5ed,35,115);
 
- const x=laneX(lane,H*.82);
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,0.1,180);
 
- const y=H*.82-jump;
+camera.position.set(0,6,11);
 
- const size=Math.max(24,W*.075);
+camera.lookAt(0,1,-8);
 
- ctx.save();
+const renderer=new THREE.WebGLRenderer({antialias:true});
 
- ctx.translate(x,y);
+renderer.setSize(innerWidth,innerHeight);
 
- if(slide>0){
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
 
-  ctx.fillStyle="#ffbd25";
+renderer.shadowMap.enabled=true;
 
-  ctx.fillRect(-size*.8,-size*.25,size*1.6,size*.5);
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 
- }else{
+root.appendChild(renderer.domElement);
 
-  ctx.fillStyle="#ffcc30";
+scene.add(new THREE.HemisphereLight(0xffffff,0x40516c,2));
 
-  ctx.beginPath();
+const sun=new THREE.DirectionalLight(0xffffff,2.5);
 
-  ctx.arc(0,-size*.8,size*.4,0,Math.PI*2);
+sun.position.set(-5,12,8);
 
-  ctx.fill();
+sun.castShadow=true;
 
-  ctx.fillStyle="#ed3f46";
+scene.add(sun);
 
-  ctx.fillRect(-size*.38,-size*.38,size*.76,size*.85);
+const gold=new THREE.MeshStandardMaterial({color:0xf7bd32,metalness:.75,roughness:.22});
 
-  ctx.fillStyle="#ffffff";
+const roadMat=new THREE.MeshStandardMaterial({color:0x303b4e,roughness:.9});
 
-  ctx.fillRect(-size*.32,size*.4,size*.23,size*.45);
+const white=new THREE.MeshStandardMaterial({color:0xffffff});
 
-  ctx.fillRect(size*.09,size*.4,size*.23,size*.45);
+const blue=new THREE.MeshStandardMaterial({color:0x0876c9,roughness:.55});
 
- }
+const dark=new THREE.MeshStandardMaterial({color:0x17243b});
 
- ctx.restore();
+const red=new THREE.MeshStandardMaterial({color:0xe74a42});
 
-}
+const skin=new THREE.MeshStandardMaterial({color:0xd99a69});
 
-function drawObject(o){
+const shirt=new THREE.MeshStandardMaterial({color:0x123f85});
 
- const x=laneX(o.lane,o.y);
+const pants=new THREE.MeshStandardMaterial({color:0x202d45});
 
- const scale=.35+o.y/H;
+const box=(w,h,d,mat,x,y,z,parent=scene)=>{
 
- const s=scale*Math.min(W*.10,55);
+ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
 
- if(o.type==="coin"){
+ m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;
 
-  ctx.fillStyle="#ffc928";
+ parent.add(m);return m;
 
-  ctx.beginPath();
+};
 
-  ctx.arc(x,o.y,s*.42,0,Math.PI*2);
+// Road and city
 
-  ctx.fill();
+box(10,.25,180,roadMat,0,-.18,-45);
 
-  ctx.strokeStyle="#fff1a5";
+for(let x of [-1.6,1.6]){
 
-  ctx.lineWidth=3;
+ const line=box(.07,.02,180,white,x,-.045,-45);
 
-  ctx.stroke();
-
-  ctx.fillStyle="#9c6500";
-
-  ctx.font=`bold ${s*.48}px Arial`;
-
-  ctx.textAlign="center";
-
-  ctx.fillText("₦",x,o.y+s*.16);
-
- }else{
-
-  ctx.fillStyle="#df4242";
-
-  ctx.fillRect(x-s*.65,o.y-s*.55,s*1.3,s*1.1);
-
-  ctx.fillStyle="#ffb34c";
-
-  ctx.fillRect(x-s*.45,o.y-s*.4,s*.9,s*.18);
-
- }
+ line.material=white;
 
 }
 
-function spawn(){
+for(let x of [-5.3,5.3])box(.4,.5,180,dark,x,-.05,-45);
 
- const type=Math.random()<.68?"coin":"block";
+const buildings=[];
 
- objects.push({
+for(let side of [-1,1]){
 
-  lane:Math.floor(Math.random()*3),
+ for(let i=0;i<16;i++){
 
-  y:-20,
+  let h=5+Math.random()*12;
 
-  type
+  let b=box(3,h,5,new THREE.MeshStandardMaterial({
 
- });
+   color:[0x38577d,0x596d91,0x274a70,0x7c8da5][i%4]
 
-}
+  }),side*(8+Math.random()*2),h/2-0.1,-i*10-5);
 
-function draw(){
+  buildings.push(b);
 
- road();
+  for(let y=1.5;y<h-1;y+=2){
 
- objects.forEach(drawObject);
+   for(let xx=-.8;xx<=.8;xx+=1.6){
 
- drawPlayer();
-
-}
-
-function addCoin(){
-
- totalCoins++;
-
- score++;
-
- save("bpr_total",totalCoins);
-
- if(totalCoins>best){
-
-  best=totalCoins;
-
-  save("bpr_best",best);
-
- }
-
- updateStats();
-
- const milestone=Math.floor(totalCoins/1000);
-
- if(milestone>claimed){
-
-  claimed=milestone;
-
-  save("bpr_claimed",claimed);
-
-  playing=false;
-
-  document.getElementById("reward").style.display="flex";
-
- }
-
-}
-
-function gameLoop(time){
-
- if(!playing)return;
-
- const dt=Math.min((time-lastTime)/16.67,2)||1;
-
- lastTime=time;
-
- ctx.clearRect(0,0,W,H);
-
- speed=Math.min(4+score*.015,10);
-
- spawnTimer+=dt;
-
- if(spawnTimer>38){
-
-  spawn();
-
-  spawnTimer=0;
-
- }
-
- objects.forEach(o=>o.y+=speed*dt);
-
- objects=objects.filter(o=>o.y<H+40);
-
- const playerY=H*.82;
-
- for(let i=objects.length-1;i>=0;i--){
-
-  const o=objects[i];
-
-  if(o.y>playerY-30 && o.y<playerY+35 && o.lane===lane){
-
-   if(o.type==="coin"){
-
-    addCoin();
-
-    objects.splice(i,1);
-
-   }else if(jump<=0 && slide<=0){
-
-    endGame();
-
-    return;
+    box(.5,.65,.05,new THREE.MeshStandardMaterial({color:0xffd77a,emissive:0x332000}),b.position.x+xx,y,b.position.z-2.53);
 
    }
 
@@ -492,113 +232,393 @@ function gameLoop(time){
 
  }
 
- if(jump>0)jump=Math.max(0,jump-10*dt);
+}
 
- if(slide>0)slide=Math.max(0,slide-dt);
+// Player
 
- draw();
+const player=new THREE.Group();
 
- if(playing)requestAnimationFrame(gameLoop);
+scene.add(player);
+
+player.position.set(0,0,2);
+
+const body=box(.8,1.1,.45,shirt,0,1.25,0,player);
+
+const head=new THREE.Mesh(new THREE.SphereGeometry(.36,16,12),skin);
+
+head.position.set(0,2.08,0);head.castShadow=true;player.add(head);
+
+const hair=new THREE.Mesh(new THREE.SphereGeometry(.37,16,8,0,Math.PI*2,0,Math.PI/2),dark);
+
+hair.position.set(0,2.18,0);player.add(hair);
+
+const legs=[];
+
+for(let x of [-.23,.23]){
+
+ let leg=box(.25,.75,.28,pants,x,.55,0,player);legs.push(leg);
+
+}
+
+const arms=[];
+
+for(let x of [-.52,.52]){
+
+ let arm=box(.22,.8,.23,shirt,x,1.3,0,player);arms.push(arm);
+
+}
+
+let lane=1, targetX=0, jumping=false,sliding=false;
+
+let jumpTime=0,slideTime=0,runTime=0;
+
+const laneX=[-2.4,0,2.4];
+
+// Obstacles and coins
+
+const objects=[];
+
+function makeCoin(z,l){
+
+ const g=new THREE.Group();
+
+ const coin=new THREE.Mesh(new THREE.TorusGeometry(.36,.12,10,22),gold);
+
+ coin.rotation.y=Math.PI/2;g.add(coin);
+
+ const core=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.08,20),gold);
+
+ core.rotation.z=Math.PI/2;g.add(core);
+
+ g.position.set(laneX[l],1.25,z);scene.add(g);
+
+ objects.push({mesh:g,type:"coin",lane:l,passed:false});
+
+}
+
+function makeObstacle(z,l,type){
+
+ const g=new THREE.Group();
+
+ if(type==="train"){
+
+  box(1.9,2.7,5,blue,0,1.35,0,g);
+
+  box(1.5,.65,.08,white,0,2.15,-2.55,g);
+
+  box(1.9,.2,.2,gold,0,.45,-2.6,g);
+
+ }else if(type==="barrier"){
+
+  box(1.8,.8,.45,red,0,.4,0,g);
+
+  box(2,.15,.55,white,0,.5,0,g);
+
+ }else{
+
+  box(1.9,.25,.3,gold,0,2.1,0,g);
+
+  box(.18,2,.25,dark,-.8,1,0,g);
+
+  box(.18,2,.25,dark,.8,1,0,g);
+
+ }
+
+ g.position.set(laneX[l],0,z);scene.add(g);
+
+ objects.push({mesh:g,type,lane:l,passed:false});
+
+}
+
+let spawnTimer=0;
+
+function spawn(){
+
+ const laneNo=Math.floor(Math.random()*3);
+
+ const r=Math.random();
+
+ if(r<.45){
+
+  makeCoin(-85,laneNo);
+
+  if(Math.random()<.65)makeCoin(-89,laneNo);
+
+  if(Math.random()<.65)makeCoin(-93,laneNo);
+
+ }else{
+
+  const type=r<.69?"barrier":r<.87?"train":"overhead";
+
+  makeObstacle(-85,laneNo,type);
+
+  if(Math.random()<.5)makeCoin(-92,(laneNo+1)%3);
+
+ }
+
+}
+
+// Game state
+
+let running=false,gameOver=false;
+
+let coins=0,score=0,speed=20,best=Number(localStorage.getItem("bcrBest")||0);
+
+let total=Number(localStorage.getItem("bcrTotal")||0);
+
+document.getElementById("best").textContent=best;
+
+let milestoneShown=false;
+
+function updateHUD(){
+
+ document.getElementById("coins").textContent=coins;
+
+ document.getElementById("score").textContent=Math.floor(score);
+
+ document.getElementById("best").textContent=best;
+
+}
+
+function message(t){
+
+ const el=document.getElementById("toast");
+
+ el.textContent=t;el.style.display="block";
+
+ setTimeout(()=>el.style.display="none",1800);
 
 }
 
 function startGame(){
 
- document.getElementById("welcome").style.display="none";
+ for(const o of objects)scene.remove(o.mesh);
 
- document.getElementById("over").style.display="none";
+ objects.length=0;
 
- document.getElementById("reward").style.display="none";
+ coins=0;score=0;speed=20;spawnTimer=0;
 
- objects=[];
+ lane=1;targetX=0;player.position.x=0;
 
- score=0;
+ jumping=false;sliding=false;gameOver=false;
 
- lane=1;
+ milestoneShown=false;running=true;
 
- speed=4;
+ document.getElementById("overlay").style.display="none";
 
- jump=0;
-
- slide=0;
-
- spawnTimer=0;
-
- playing=true;
-
- lastTime=performance.now();
-
- requestAnimationFrame(gameLoop);
+ updateHUD();
 
 }
 
 function endGame(){
 
- playing=false;
+ running=false;gameOver=true;
 
- document.getElementById("earned").textContent=score;
+ best=Math.max(best,Math.floor(score));
 
- document.getElementById("over").style.display="flex";
+ localStorage.setItem("bcrBest",best);
+
+ localStorage.setItem("bcrTotal",total);
+
+ updateHUD();
+
+ document.querySelector(".card h1").innerHTML="RUN OVER!";
+
+ document.querySelector(".card p").innerHTML="You collected "+coins+" coins and scored "+Math.floor(score)+" points.";
+
+ document.getElementById("start").textContent="PLAY AGAIN";
+
+ document.getElementById("overlay").style.display="flex";
 
 }
 
-function closeReward(){
+function moveLeft(){if(running){lane=Math.max(0,lane-1);targetX=laneX[lane]}}
 
- document.getElementById("reward").style.display="none";
+function moveRight(){if(running){lane=Math.min(2,lane+1);targetX=laneX[lane]}}
 
- playing=true;
+function jump(){if(running&&!jumping&&!sliding){jumping=true;jumpTime=.65}}
 
- lastTime=performance.now();
+function slide(){if(running&&!jumping&&!sliding){sliding=true;slideTime=.65}}
 
- requestAnimationFrame(gameLoop);
+document.getElementById("start").onclick=startGame;
 
-}
+document.getElementById("left").onclick=moveLeft;
 
-function moveLeft(){if(playing)lane=Math.max(0,lane-1)}
+document.getElementById("right").onclick=moveRight;
 
-function moveRight(){if(playing)lane=Math.min(2,lane+1)}
+document.getElementById("jump").onclick=jump;
 
-function doJump(){if(playing && jump<=0 && slide<=0)jump=85}
+document.getElementById("slide").onclick=slide;
 
-function doSlide(){if(playing && jump<=0)slide=35}
+addEventListener("keydown",e=>{
 
-let startX=0,startY=0;
+ if(e.key==="ArrowLeft"||e.key==="a")moveLeft();
 
-canvas.addEventListener("touchstart",e=>{
+ if(e.key==="ArrowRight"||e.key==="d")moveRight();
 
- startX=e.touches[0].clientX;
+ if(e.key==="ArrowUp"||e.key===" ")jump();
 
- startY=e.touches[0].clientY;
+ if(e.key==="ArrowDown"||e.key==="s")slide();
+
+});
+
+let touchX=0,touchY=0;
+
+addEventListener("touchstart",e=>{
+
+ touchX=e.changedTouches[0].clientX;
+
+ touchY=e.changedTouches[0].clientY;
 
 },{passive:true});
 
-canvas.addEventListener("touchend",e=>{
+addEventListener("touchend",e=>{
 
- const dx=e.changedTouches[0].clientX-startX;
+ const dx=e.changedTouches[0].clientX-touchX;
 
- const dy=e.changedTouches[0].clientY-startY;
+ const dy=e.changedTouches[0].clientY-touchY;
 
- if(Math.abs(dx)>Math.abs(dy)){
+ if(Math.max(Math.abs(dx),Math.abs(dy))<25)return;
 
-  dx>25?moveRight():dx< -25?moveLeft():null;
+ if(Math.abs(dx)>Math.abs(dy)){dx>0?moveRight():moveLeft()}
 
- }else{
+ else{dy<0?jump():slide()}
 
-  dy< -25?doJump():dy>25?doSlide():null;
+},{passive:true});
+
+// Animation
+
+const clock=new THREE.Clock();
+
+function animate(){
+
+ requestAnimationFrame(animate);
+
+ const dt=Math.min(clock.getDelta(),.04);
+
+ if(running){
+
+  score+=dt*speed*.5;
+
+  speed=Math.min(34,20+score/180);
+
+  spawnTimer+=dt;
+
+  if(spawnTimer>1.05){spawn();spawnTimer=0}
+
+  runTime+=dt;
+
+  player.position.x+=(targetX-player.position.x)*Math.min(1,dt*12);
+
+  if(jumping){
+
+   jumpTime-=dt;
+
+   player.position.y=Math.sin((.65-jumpTime)/.65*Math.PI)*2;
+
+   if(jumpTime<=0){jumping=false;player.position.y=0}
+
+  }
+
+  if(sliding){
+
+   slideTime-=dt;player.scale.y=.5;
+
+   if(slideTime<=0){sliding=false;player.scale.y=1}
+
+  }
+
+  if(!sliding){
+
+   legs[0].rotation.x=Math.sin(runTime*14)*.7;
+
+   legs[1].rotation.x=-Math.sin(runTime*14)*.7;
+
+   arms[0].rotation.x=-Math.sin(runTime*14)*.5;
+
+   arms[1].rotation.x=Math.sin(runTime*14)*.5;
+
+  }
+
+  player.rotation.z+=(targetX-player.position.x)*-.03;
+
+  for(let i=objects.length-1;i>=0;i--){
+
+   const o=objects[i];
+
+   o.mesh.position.z+=speed*dt;
+
+   if(o.type==="coin"){
+
+    o.mesh.rotation.y+=dt*4;
+
+    o.mesh.position.y=1.25+Math.sin(runTime*5+i)*.12;
+
+   }
+
+   const close=Math.abs(o.mesh.position.z-player.position.z)<1.1;
+
+   const sameLane=Math.abs(o.mesh.position.x-player.position.x)<1.05;
+
+   if(close&&sameLane&&!o.passed){
+
+    o.passed=true;
+
+    if(o.type==="coin"){
+
+     coins++;total++;
+
+     score+=10;
+
+     localStorage.setItem("bcrTotal",total);
+
+     if(coins===1000&&!milestoneShown){
+
+      milestoneShown=true;
+
+      message("🎉 1,000 COINS! DEMO MILESTONE!");
+
+     }
+
+    }else{
+
+     const safe=(o.type==="barrier"&&jumping)||(o.type==="overhead"&&sliding);
+
+     if(!safe)endGame();
+
+    }
+
+   }
+
+   if(o.mesh.position.z>13){
+
+    scene.remove(o.mesh);objects.splice(i,1);
+
+   }
+
+  }
+
+  updateHUD();
 
  }
 
-},{passive:true});
+ camera.position.x+=(player.position.x*.18-camera.position.x)*dt*2;
 
-document.addEventListener("keydown",e=>{
+ camera.lookAt(player.position.x*.15,1,-8);
 
- if(e.key==="ArrowLeft")moveLeft();
+ renderer.render(scene,camera);
 
- if(e.key==="ArrowRight")moveRight();
+}
 
- if(e.key==="ArrowUp"||e.key===" ")doJump();
+animate();
 
- if(e.key==="ArrowDown")doSlide();
+addEventListener("resize",()=>{
+
+ camera.aspect=innerWidth/innerHeight;
+
+ camera.updateProjectionMatrix();
+
+ renderer.setSize(innerWidth,innerHeight);
 
 });
 
