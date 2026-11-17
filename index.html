@@ -6,7 +6,7 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 
 <title>Beeperpay Coin Rush</title>
 
@@ -14,41 +14,47 @@
 
 *{box-sizing:border-box}
 
-body{margin:0;background:#07152d;color:white;font-family:Arial,sans-serif;overflow:hidden;touch-action:none}
-
-#game{position:fixed;inset:0}
+body{margin:0;background:#08162d;color:white;font-family:Arial;overflow:hidden;touch-action:none}
 
 canvas{display:block}
 
-#hud{position:absolute;top:15px;left:0;right:0;display:flex;justify-content:space-between;padding:12px;pointer-events:none;z-index:3}
+#game{position:fixed;inset:0}
 
-.panel{background:#07152ddd;border:1px solid #d5aa42;border-radius:14px;padding:10px 15px;font-weight:bold;box-shadow:0 4px 15px #0005}
+#hud{position:absolute;top:12px;left:10px;right:10px;display:flex;justify-content:space-between;z-index:2;pointer-events:none}
 
-#brand{position:absolute;top:75px;left:0;right:0;text-align:center;font-weight:900;letter-spacing:3px;color:#f4c64d;text-shadow:0 2px 5px #000}
+.stat{background:#0b2141dd;border:1px solid #e9bd4d;border-radius:12px;padding:10px;font-weight:bold}
 
-#overlay{position:absolute;inset:0;background:linear-gradient(#06142bd9,#06142b99);display:flex;align-items:center;justify-content:center;z-index:5;padding:20px}
+#brand{position:absolute;top:72px;width:100%;text-align:center;color:#f6c64b;letter-spacing:4px;font-weight:900;text-shadow:0 2px 6px #000}
 
-.card{background:#10274b;border:2px solid #e5b944;border-radius:24px;padding:28px 22px;text-align:center;width:min(90%,390px);box-shadow:0 12px 40px #0008}
+#overlay{position:absolute;inset:0;background:#06152bdc;z-index:5;display:flex;align-items:center;justify-content:center;padding:14px;overflow:auto}
 
-h1{color:#f5c84c;font-size:29px;margin:0 0 10px}
+.card{width:min(100%,440px);max-height:94vh;overflow:auto;background:#10284a;border:2px solid #e5b942;border-radius:22px;padding:20px;text-align:center}
 
-.card p{line-height:1.5;color:#dbe7fa}
+h1{color:#f6c84e;margin:5px;font-size:27px}
 
-button{border:0;border-radius:14px;padding:14px 20px;font-weight:bold;font-size:16px;cursor:pointer}
+button{border:0;border-radius:12px;padding:12px;font-weight:bold;font-size:15px;cursor:pointer}
 
-.primary{background:#e8b83d;color:#14233d;width:100%;margin-top:12px}
+.primary{background:#eabc42;color:#12213a;width:100%;margin-top:12px}
 
-#controls{position:absolute;bottom:20px;left:0;right:0;display:flex;justify-content:space-between;padding:0 22px;z-index:4;pointer-events:none}
+#characters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
 
-.control{pointer-events:auto;background:#07152dcc;color:white;border:2px solid #e7bb47;border-radius:50%;width:62px;height:62px;font-size:24px}
+.person{background:#1a3b65;border:2px solid transparent;border-radius:12px;padding:7px 2px;color:white;min-width:0}
 
-#rightControls{display:flex;gap:12px}
+.person.selected{border-color:#ffcc4a;background:#315b85}
 
-#hint{position:absolute;bottom:95px;left:0;right:0;text-align:center;color:white;font-size:12px;text-shadow:0 2px 4px #000;pointer-events:none}
+.avatar{height:65px;display:flex;align-items:center;justify-content:center;font-size:38px}
 
-#toast{position:absolute;top:125px;left:0;right:0;text-align:center;color:#ffda63;font-weight:bold;font-size:20px;display:none;z-index:4}
+.person small{font-size:10px;display:block}
 
-#small{font-size:12px;color:#a9bedb}
+#controls{position:absolute;bottom:16px;left:0;right:0;display:flex;justify-content:space-between;padding:0 15px;z-index:3;pointer-events:none}
+
+.control{pointer-events:auto;width:55px;height:55px;border-radius:50%;background:#10284add;border:2px solid #edc34d;color:white;font-size:22px}
+
+#rightControls{display:flex;gap:8px}
+
+#hint{position:absolute;bottom:80px;width:100%;text-align:center;font-size:11px;text-shadow:0 2px 4px black;pointer-events:none}
+
+#toast{position:absolute;top:120px;width:100%;text-align:center;color:#ffdc66;font-weight:bold;z-index:4;display:none;font-size:18px}
 
 </style>
 
@@ -60,11 +66,11 @@ button{border:0;border-radius:14px;padding:14px 20px;font-weight:bold;font-size:
 
 <div id="hud">
 
- <div class="panel">🪙 <span id="coins">0</span></div>
+ <div class="stat">🪙 <span id="coins">0</span></div>
 
- <div class="panel">🏆 <span id="score">0</span></div>
+ <div class="stat">🏆 <span id="score">0</span></div>
 
- <div class="panel">⭐ <span id="best">0</span></div>
+ <div class="stat">⭐ <span id="best">0</span></div>
 
 </div>
 
@@ -78,19 +84,19 @@ button{border:0;border-radius:14px;padding:14px 20px;font-weight:bold;font-size:
 
   <h1>BEEPERPAY<br>COIN RUSH</h1>
 
-  <p>Run through the city, collect gold coins and dodge obstacles!</p>
+  <p id="intro">Choose your runner!</p>
 
-  <p>⬅️ Change lanes · ⬆️ Jump · ⬇️ Slide</p>
+  <div id="characters"></div>
 
   <button class="primary" id="start">START RUNNING</button>
 
-  <p id="small">Original Beeperpay game prototype</p>
+  <p style="font-size:11px;color:#b9cce3">Choose your character. Collect coins. Beat your best score!</p>
 
  </div>
 
 </div>
 
-<div id="hint">Swipe left/right to move · Swipe up to jump · Swipe down to slide</div>
+<div id="hint">Swipe left/right to move · Up to jump · Down to slide</div>
 
 <div id="controls">
 
@@ -110,15 +116,7 @@ button{border:0;border-radius:14px;padding:14px 20px;font-weight:bold;font-size:
 
 <script type="importmap">
 
-{
-
- "imports":{
-
-  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
-
- }
-
-}
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
 
 </script>
 
@@ -126,35 +124,79 @@ button{border:0;border-radius:14px;padding:14px 20px;font-weight:bold;font-size:
 
 import * as THREE from "three";
 
+const characters=[
+
+ {name:"Joel",gender:"M",skin:0xd49a70,hair:0x20202a,style:"Short hair"},
+
+ {name:"David",gender:"M",skin:0x75442e,hair:0x141414,style:"Curly hair"},
+
+ {name:"Alex",gender:"M",skin:0xf0c59b,hair:0x6b3822,style:"Brown hair"},
+
+ {name:"Sam",gender:"M",skin:0x9a6246,hair:0x1b1520,style:"Fade"},
+
+ {name:"Lina",gender:"F",skin:0xc88961,hair:0x24151c,style:"Ponytail"},
+
+ {name:"Maya",gender:"F",skin:0x71432f,hair:0x17131d,style:"Curly"},
+
+ {name:"Zara",gender:"F",skin:0xf0c39d,hair:0x8a4925,style:"Long hair"},
+
+ {name:"Nia",gender:"F",skin:0x9a654b,hair:0x17121a,style:"Braids"}
+
+];
+
+let selected=0;
+
+const picker=document.getElementById("characters");
+
+characters.forEach((c,i)=>{
+
+ const b=document.createElement("button");
+
+ b.className="person"+(i===0?" selected":"");
+
+ b.innerHTML=`<div class="avatar">${c.gender==="F"?"👩🏽":"👨🏽"}</div><b>${c.name}</b><small>${c.gender==="F"?"Female":"Male"}</small>`;
+
+ b.onclick=()=>{
+
+  selected=i;
+
+  document.querySelectorAll(".person").forEach(x=>x.classList.remove("selected"));
+
+  b.classList.add("selected");
+
+  buildPlayer();
+
+ };
+
+ picker.appendChild(b);
+
+});
+
 const root=document.getElementById("game");
 
 const scene=new THREE.Scene();
 
-scene.background=new THREE.Color(0x8bc5ed);
+scene.background=new THREE.Color(0x82b9e0);
 
-scene.fog=new THREE.Fog(0x8bc5ed,35,115);
+scene.fog=new THREE.Fog(0x82b9e0,35,115);
 
-const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,0.1,180);
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,160);
 
 camera.position.set(0,6,11);
-
-camera.lookAt(0,1,-8);
 
 const renderer=new THREE.WebGLRenderer({antialias:true});
 
 renderer.setSize(innerWidth,innerHeight);
 
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 
 renderer.shadowMap.enabled=true;
 
-renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-
 root.appendChild(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0xffffff,0x40516c,2));
+scene.add(new THREE.HemisphereLight(0xffffff,0x4b5268,2));
 
-const sun=new THREE.DirectionalLight(0xffffff,2.5);
+const sun=new THREE.DirectionalLight(0xffffff,2.2);
 
 sun.position.set(-5,12,8);
 
@@ -162,69 +204,51 @@ sun.castShadow=true;
 
 scene.add(sun);
 
-const gold=new THREE.MeshStandardMaterial({color:0xf7bd32,metalness:.75,roughness:.22});
+const mat=(color,metalness=0,roughness=.7)=>new THREE.MeshStandardMaterial({color,metalness,roughness});
 
-const roadMat=new THREE.MeshStandardMaterial({color:0x303b4e,roughness:.9});
+const navy=mat(0x102f60);
 
-const white=new THREE.MeshStandardMaterial({color:0xffffff});
+const gold=mat(0xf4bd35,.7,.25);
 
-const blue=new THREE.MeshStandardMaterial({color:0x0876c9,roughness:.55});
+const pantsMat=mat(0x202b40);
 
-const dark=new THREE.MeshStandardMaterial({color:0x17243b});
+const road=mat(0x303c4b);
 
-const red=new THREE.MeshStandardMaterial({color:0xe74a42});
+const white=mat(0xffffff);
 
-const skin=new THREE.MeshStandardMaterial({color:0xd99a69});
+const dark=mat(0x15243b);
 
-const shirt=new THREE.MeshStandardMaterial({color:0x123f85});
+const red=mat(0xe44b43);
 
-const pants=new THREE.MeshStandardMaterial({color:0x202d45});
+const blue=mat(0x0872bc);
 
-const box=(w,h,d,mat,x,y,z,parent=scene)=>{
+const box=(w,h,d,m,x,y,z,parent=scene)=>{
 
- const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+ const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
 
- m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;
-
- parent.add(m);return m;
+ o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;
 
 };
 
-// Road and city
+box(10,.2,180,road,0,-.18,-45);
 
-box(10,.25,180,roadMat,0,-.18,-45);
+for(const x of [-1.6,1.6])box(.06,.02,180,white,x,-.06,-45);
 
-for(let x of [-1.6,1.6]){
+for(const x of [-5.2,5.2])box(.3,.5,180,dark,x,0,-45);
 
- const line=box(.07,.02,180,white,x,-.045,-45);
+for(const side of [-1,1]){
 
- line.material=white;
+ for(let i=0;i<17;i++){
 
-}
+  const h=5+Math.random()*11;
 
-for(let x of [-5.3,5.3])box(.4,.5,180,dark,x,-.05,-45);
-
-const buildings=[];
-
-for(let side of [-1,1]){
-
- for(let i=0;i<16;i++){
-
-  let h=5+Math.random()*12;
-
-  let b=box(3,h,5,new THREE.MeshStandardMaterial({
-
-   color:[0x38577d,0x596d91,0x274a70,0x7c8da5][i%4]
-
-  }),side*(8+Math.random()*2),h/2-0.1,-i*10-5);
-
-  buildings.push(b);
+  const building=box(3,h,5,mat([0x365a7c,0x596b8d,0x27486c][i%3]),side*8,h/2,-i*10-5);
 
   for(let y=1.5;y<h-1;y+=2){
 
-   for(let xx=-.8;xx<=.8;xx+=1.6){
+   for(let x of [-.8,.8]){
 
-    box(.5,.65,.05,new THREE.MeshStandardMaterial({color:0xffd77a,emissive:0x332000}),b.position.x+xx,y,b.position.z-2.53);
+    box(.5,.65,.05,mat(0xffd57c,.1,.3),building.position.x+x,y,building.position.z-2.53);
 
    }
 
@@ -234,69 +258,115 @@ for(let side of [-1,1]){
 
 }
 
-// Player
-
-const player=new THREE.Group();
+let player=new THREE.Group();
 
 scene.add(player);
 
-player.position.set(0,0,2);
+let legs=[],arms=[];
 
-const body=box(.8,1.1,.45,shirt,0,1.25,0,player);
+function buildPlayer(){
 
-const head=new THREE.Mesh(new THREE.SphereGeometry(.36,16,12),skin);
+ scene.remove(player);
 
-head.position.set(0,2.08,0);head.castShadow=true;player.add(head);
+ player=new THREE.Group();
 
-const hair=new THREE.Mesh(new THREE.SphereGeometry(.37,16,8,0,Math.PI*2,0,Math.PI/2),dark);
+ player.position.set(0,0,2);
 
-hair.position.set(0,2.18,0);player.add(hair);
+ scene.add(player);
 
-const legs=[];
+ legs=[];arms=[];
 
-for(let x of [-.23,.23]){
+ const c=characters[selected];
 
- let leg=box(.25,.75,.28,pants,x,.55,0,player);legs.push(leg);
+ const skin=mat(c.skin),hair=mat(c.hair);
+
+ // legs
+
+ for(const x of [-.23,.23])legs.push(box(.24,.75,.27,pantsMat,x,.55,0,player));
+
+ // shoes
+
+ for(const x of [-.23,.23])box(.32,.18,.42,white,x,.16,.04,player);
+
+ // body
+
+ box(.85,1.08,.45,navy,0,1.25,0,player);
+
+ // gold shoulder details
+
+ for(const x of [-.39,.39])box(.1,.5,.47,gold,x,1.45,0,player);
+
+ // head
+
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.34,18,14),skin);
+
+ head.position.set(0,2.08,0);player.add(head);
+
+ // hair cap
+
+ const cap=new THREE.Mesh(new THREE.SphereGeometry(.36,18,10,0,Math.PI*2,0,Math.PI/2),hair);
+
+ cap.position.set(0,2.17,0);player.add(cap);
+
+ // ponytail for female characters
+
+ if(c.gender==="F"){
+
+  const tail=new THREE.Mesh(new THREE.CylinderGeometry(.09,.14,.65,10),hair);
+
+  tail.position.set(0,1.95,.35);tail.rotation.x=-.5;player.add(tail);
+
+ }
+
+ // arms
+
+ for(const x of [-.53,.53])arms.push(box(.2,.78,.22,navy,x,1.3,0,player));
+
+ // gold B emblem on back, facing camera
+
+ const emblem=new THREE.Group();
+
+ emblem.position.set(0,1.35,.24);
+
+ const letter=new THREE.Mesh(new THREE.BoxGeometry(.34,.42,.045),gold);
+
+ emblem.add(letter);
+
+ for(const y of [-.12,.12]){
+
+  const curve=new THREE.Mesh(new THREE.TorusGeometry(.115,.045,8,14,Math.PI),gold);
+
+  curve.rotation.z=Math.PI/2;
+
+  curve.position.set(.1,y,-.025);
+
+  emblem.add(curve);
+
+ }
+
+ player.add(emblem);
 
 }
 
-const arms=[];
+buildPlayer();
 
-for(let x of [-.52,.52]){
+const laneX=[-2.4,0,2.4],objects=[];
 
- let arm=box(.22,.8,.23,shirt,x,1.3,0,player);arms.push(arm);
+let lane=1,targetX=0,jumping=false,sliding=false,jumpTime=0,slideTime=0,runTime=0;
 
-}
-
-let lane=1, targetX=0, jumping=false,sliding=false;
-
-let jumpTime=0,slideTime=0,runTime=0;
-
-const laneX=[-2.4,0,2.4];
-
-// Obstacles and coins
-
-const objects=[];
-
-function makeCoin(z,l){
+function coin(z,l){
 
  const g=new THREE.Group();
 
- const coin=new THREE.Mesh(new THREE.TorusGeometry(.36,.12,10,22),gold);
+ const c=new THREE.Mesh(new THREE.TorusGeometry(.34,.11,10,20),gold);
 
- coin.rotation.y=Math.PI/2;g.add(coin);
+ g.add(c);g.position.set(laneX[l],1.3,z);scene.add(g);
 
- const core=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.08,20),gold);
-
- core.rotation.z=Math.PI/2;g.add(core);
-
- g.position.set(laneX[l],1.25,z);scene.add(g);
-
- objects.push({mesh:g,type:"coin",lane:l,passed:false});
+ objects.push({mesh:g,type:"coin"});
 
 }
 
-function makeObstacle(z,l,type){
+function obstacle(z,l,type){
 
  const g=new THREE.Group();
 
@@ -304,19 +374,19 @@ function makeObstacle(z,l,type){
 
   box(1.9,2.7,5,blue,0,1.35,0,g);
 
-  box(1.5,.65,.08,white,0,2.15,-2.55,g);
+  box(1.5,.7,.1,white,0,2.1,-2.55,g);
 
-  box(1.9,.2,.2,gold,0,.45,-2.6,g);
+  box(1.9,.2,.2,gold,0,.4,-2.55,g);
 
  }else if(type==="barrier"){
 
   box(1.8,.8,.45,red,0,.4,0,g);
 
-  box(2,.15,.55,white,0,.5,0,g);
+  box(2,.12,.5,white,0,.52,0,g);
 
  }else{
 
-  box(1.9,.25,.3,gold,0,2.1,0,g);
+  box(1.9,.2,.3,gold,0,2.05,0,g);
 
   box(.18,2,.25,dark,-.8,1,0,g);
 
@@ -326,51 +396,27 @@ function makeObstacle(z,l,type){
 
  g.position.set(laneX[l],0,z);scene.add(g);
 
- objects.push({mesh:g,type,lane:l,passed:false});
+ objects.push({mesh:g,type});
 
 }
-
-let spawnTimer=0;
 
 function spawn(){
 
- const laneNo=Math.floor(Math.random()*3);
+ const l=Math.floor(Math.random()*3),r=Math.random();
 
- const r=Math.random();
+ if(r<.52){
 
- if(r<.45){
+  for(let j=0;j<4;j++)coin(-85-j*3,l);
 
-  makeCoin(-85,laneNo);
-
-  if(Math.random()<.65)makeCoin(-89,laneNo);
-
-  if(Math.random()<.65)makeCoin(-93,laneNo);
-
- }else{
-
-  const type=r<.69?"barrier":r<.87?"train":"overhead";
-
-  makeObstacle(-85,laneNo,type);
-
-  if(Math.random()<.5)makeCoin(-92,(laneNo+1)%3);
-
- }
+ }else obstacle(-85,l,r<.72?"barrier":r<.88?"train":"overhead");
 
 }
 
-// Game state
-
-let running=false,gameOver=false;
-
-let coins=0,score=0,speed=20,best=Number(localStorage.getItem("bcrBest")||0);
-
-let total=Number(localStorage.getItem("bcrTotal")||0);
+let running=false,coins=0,score=0,speed=20,spawnTime=0,best=Number(localStorage.bcrBest||0);
 
 document.getElementById("best").textContent=best;
 
-let milestoneShown=false;
-
-function updateHUD(){
+function hud(){
 
  document.getElementById("coins").textContent=coins;
 
@@ -380,51 +426,35 @@ function updateHUD(){
 
 }
 
-function message(t){
+function start(){
 
- const el=document.getElementById("toast");
+ objects.forEach(o=>scene.remove(o.mesh));objects.length=0;
 
- el.textContent=t;el.style.display="block";
+ lane=1;targetX=0;player.position.x=0;player.position.y=0;
 
- setTimeout(()=>el.style.display="none",1800);
+ coins=0;score=0;speed=20;spawnTime=0;
 
-}
-
-function startGame(){
-
- for(const o of objects)scene.remove(o.mesh);
-
- objects.length=0;
-
- coins=0;score=0;speed=20;spawnTimer=0;
-
- lane=1;targetX=0;player.position.x=0;
-
- jumping=false;sliding=false;gameOver=false;
-
- milestoneShown=false;running=true;
+ jumping=false;sliding=false;running=true;
 
  document.getElementById("overlay").style.display="none";
 
- updateHUD();
+ hud();
 
 }
 
-function endGame(){
+function end(){
 
- running=false;gameOver=true;
+ running=false;
 
  best=Math.max(best,Math.floor(score));
 
- localStorage.setItem("bcrBest",best);
+ localStorage.bcrBest=best;
 
- localStorage.setItem("bcrTotal",total);
+ hud();
 
- updateHUD();
+ document.querySelector("#overlay h1").innerHTML="RUN OVER!";
 
- document.querySelector(".card h1").innerHTML="RUN OVER!";
-
- document.querySelector(".card p").innerHTML="You collected "+coins+" coins and scored "+Math.floor(score)+" points.";
+ document.getElementById("intro").textContent=`${characters[selected].name}, you collected ${coins} coins and scored ${Math.floor(score)} points.`;
 
  document.getElementById("start").textContent="PLAY AGAIN";
 
@@ -432,19 +462,19 @@ function endGame(){
 
 }
 
-function moveLeft(){if(running){lane=Math.max(0,lane-1);targetX=laneX[lane]}}
+function left(){if(running){lane=Math.max(0,lane-1);targetX=laneX[lane]}}
 
-function moveRight(){if(running){lane=Math.min(2,lane+1);targetX=laneX[lane]}}
+function right(){if(running){lane=Math.min(2,lane+1);targetX=laneX[lane]}}
 
 function jump(){if(running&&!jumping&&!sliding){jumping=true;jumpTime=.65}}
 
 function slide(){if(running&&!jumping&&!sliding){sliding=true;slideTime=.65}}
 
-document.getElementById("start").onclick=startGame;
+document.getElementById("start").onclick=start;
 
-document.getElementById("left").onclick=moveLeft;
+document.getElementById("left").onclick=left;
 
-document.getElementById("right").onclick=moveRight;
+document.getElementById("right").onclick=right;
 
 document.getElementById("jump").onclick=jump;
 
@@ -452,41 +482,33 @@ document.getElementById("slide").onclick=slide;
 
 addEventListener("keydown",e=>{
 
- if(e.key==="ArrowLeft"||e.key==="a")moveLeft();
+ if(e.key==="ArrowLeft")left();if(e.key==="ArrowRight")right();
 
- if(e.key==="ArrowRight"||e.key==="d")moveRight();
-
- if(e.key==="ArrowUp"||e.key===" ")jump();
-
- if(e.key==="ArrowDown"||e.key==="s")slide();
+ if(e.key==="ArrowUp"||e.key===" ")jump();if(e.key==="ArrowDown")slide();
 
 });
 
-let touchX=0,touchY=0;
+let tx=0,ty=0;
 
-addEventListener("touchstart",e=>{
-
- touchX=e.changedTouches[0].clientX;
-
- touchY=e.changedTouches[0].clientY;
-
-},{passive:true});
+addEventListener("touchstart",e=>{tx=e.changedTouches[0].clientX;ty=e.changedTouches[0].clientY},{passive:true});
 
 addEventListener("touchend",e=>{
 
- const dx=e.changedTouches[0].clientX-touchX;
-
- const dy=e.changedTouches[0].clientY-touchY;
+ const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
 
  if(Math.max(Math.abs(dx),Math.abs(dy))<25)return;
 
- if(Math.abs(dx)>Math.abs(dy)){dx>0?moveRight():moveLeft()}
-
- else{dy<0?jump():slide()}
+ if(Math.abs(dx)>Math.abs(dy)){dx>0?right():left()}else{dy<0?jump():slide()}
 
 },{passive:true});
 
-// Animation
+function toast(s){
+
+ const t=document.getElementById("toast");t.textContent=s;t.style.display="block";
+
+ setTimeout(()=>t.style.display="none",1600);
+
+}
 
 const clock=new THREE.Clock();
 
@@ -498,35 +520,17 @@ function animate(){
 
  if(running){
 
-  score+=dt*speed*.5;
+  score+=dt*speed*.5;speed=Math.min(34,20+score/180);
 
-  speed=Math.min(34,20+score/180);
-
-  spawnTimer+=dt;
-
-  if(spawnTimer>1.05){spawn();spawnTimer=0}
+  spawnTime+=dt;if(spawnTime>1.1){spawn();spawnTime=0}
 
   runTime+=dt;
 
   player.position.x+=(targetX-player.position.x)*Math.min(1,dt*12);
 
-  if(jumping){
+  if(jumping){jumpTime-=dt;player.position.y=Math.sin((.65-jumpTime)/.65*Math.PI)*2;if(jumpTime<=0){jumping=false;player.position.y=0}}
 
-   jumpTime-=dt;
-
-   player.position.y=Math.sin((.65-jumpTime)/.65*Math.PI)*2;
-
-   if(jumpTime<=0){jumping=false;player.position.y=0}
-
-  }
-
-  if(sliding){
-
-   slideTime-=dt;player.scale.y=.5;
-
-   if(slideTime<=0){sliding=false;player.scale.y=1}
-
-  }
+  if(sliding){slideTime-=dt;player.scale.y=.5;if(slideTime<=0){sliding=false;player.scale.y=1}}
 
   if(!sliding){
 
@@ -540,65 +544,27 @@ function animate(){
 
   }
 
-  player.rotation.z+=(targetX-player.position.x)*-.03;
-
   for(let i=objects.length-1;i>=0;i--){
 
-   const o=objects[i];
+   const o=objects[i];o.mesh.position.z+=speed*dt;
 
-   o.mesh.position.z+=speed*dt;
+   if(o.type==="coin")o.mesh.rotation.y+=dt*4;
 
-   if(o.type==="coin"){
+   if(Math.abs(o.mesh.position.z-2)<1.1&&Math.abs(o.mesh.position.x-player.position.x)<1.05&&!o.hit){
 
-    o.mesh.rotation.y+=dt*4;
+    o.hit=true;
 
-    o.mesh.position.y=1.25+Math.sin(runTime*5+i)*.12;
+    if(o.type==="coin"){coins++;score+=10;if(coins===1000)toast("🎉 1,000 COINS! DEMO MILESTONE!")}
 
-   }
-
-   const close=Math.abs(o.mesh.position.z-player.position.z)<1.1;
-
-   const sameLane=Math.abs(o.mesh.position.x-player.position.x)<1.05;
-
-   if(close&&sameLane&&!o.passed){
-
-    o.passed=true;
-
-    if(o.type==="coin"){
-
-     coins++;total++;
-
-     score+=10;
-
-     localStorage.setItem("bcrTotal",total);
-
-     if(coins===1000&&!milestoneShown){
-
-      milestoneShown=true;
-
-      message("🎉 1,000 COINS! DEMO MILESTONE!");
-
-     }
-
-    }else{
-
-     const safe=(o.type==="barrier"&&jumping)||(o.type==="overhead"&&sliding);
-
-     if(!safe)endGame();
-
-    }
+    else if(!((o.type==="barrier"&&jumping)||(o.type==="overhead"&&sliding)))end();
 
    }
 
-   if(o.mesh.position.z>13){
-
-    scene.remove(o.mesh);objects.splice(i,1);
-
-   }
+   if(o.mesh.position.z>13){scene.remove(o.mesh);objects.splice(i,1)}
 
   }
 
-  updateHUD();
+  hud();
 
  }
 
@@ -614,9 +580,7 @@ animate();
 
 addEventListener("resize",()=>{
 
- camera.aspect=innerWidth/innerHeight;
-
- camera.updateProjectionMatrix();
+ camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
 
  renderer.setSize(innerWidth,innerHeight);
 
